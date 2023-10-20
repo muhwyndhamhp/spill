@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/muhwyndhamhp/gotes-mx/config"
-	"github.com/muhwyndhamhp/gotes-mx/public"
-	"github.com/muhwyndhamhp/gotes-mx/template"
-	"github.com/muhwyndhamhp/gotes-mx/utils/routing"
+	"github.com/muhwyndhamhp/spill/config"
+	"github.com/muhwyndhamhp/spill/public"
+	"github.com/muhwyndhamhp/spill/template"
+	"github.com/muhwyndhamhp/spill/utils/routing"
 )
 
 func main() {

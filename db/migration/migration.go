@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/muhwyndhamhp/gotes-mx/db"
+	"github.com/muhwyndhamhp/spill/db"
 )
 
 func main() {

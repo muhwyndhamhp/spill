@@ -6,7 +6,7 @@ import (
 	"github.com/apsystole/log"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/muhwyndhamhp/gotes-mx/utils/resp"
+	"github.com/muhwyndhamhp/spill/utils/resp"
 	"golang.org/x/time/rate"
 )
 

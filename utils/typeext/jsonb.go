@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/muhwyndhamhp/gotes-mx/utils/errs"
+	"github.com/muhwyndhamhp/spill/utils/errs"
 )
 
 type JSONB map[string]interface{}

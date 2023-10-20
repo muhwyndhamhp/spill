@@ -1,4 +1,4 @@
-module github.com/muhwyndhamhp/gotes-mx
+module github.com/muhwyndhamhp/spill
 
 go 1.20
 
