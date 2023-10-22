@@ -9,7 +9,7 @@ import "context"
 import "io"
 import "bytes"
 
-func DocType() templ.Component {
+func Login() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {
@@ -22,7 +22,15 @@ func DocType() templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<!doctype html>")
+		err = DocType().Render(ctx, templBuffer)
+		if err != nil {
+			return err
+		}
+		err = Head().Render(ctx, templBuffer)
+		if err != nil {
+			return err
+		}
+		err = Body(pageLogin()).Render(ctx, templBuffer)
 		if err != nil {
 			return err
 		}
@@ -33,7 +41,7 @@ func DocType() templ.Component {
 	})
 }
 
-func Head() templ.Component {
+func pageLogin() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {
@@ -46,57 +54,26 @@ func Head() templ.Component {
 			var_2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<head><link rel=\"stylesheet\" href=\"/dist/tailwind.css\"><script src=\"/dist/htmx.min.js\">")
+		_, err = templBuffer.WriteString("<script async crossorigin=\"anonymous\" data-clerk-publishable-key=\"pk_test_cGVhY2VmdWwtb2FyZmlzaC0wLmNsZXJrLmFjY291bnRzLmRldiQ\" onload=\"window.Clerk.load()\" src=\"https://peaceful-oarfish-0.clerk.accounts.dev/npm/@clerk/clerk-js@4/dist/clerk.browser.js\" type=\"text/javascript\">")
 		if err != nil {
 			return err
 		}
-		var_3 := ``
+		var_3 := `
+    `
 		_, err = templBuffer.WriteString(var_3)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</script><script src=\"https://unpkg.com/hyperscript.org@0.9.11\">")
+		_, err = templBuffer.WriteString("</script><button onclick=\"Clerk.openSignIn()\">")
 		if err != nil {
 			return err
 		}
-		var_4 := ``
+		var_4 := `Sign In`
 		_, err = templBuffer.WriteString(var_4)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</script><link rel=\"icon\" type=\"image/x-icon\" href=\"/dist/favicon.ico\"></head>")
-		if err != nil {
-			return err
-		}
-		if !templIsBuffer {
-			_, err = templBuffer.WriteTo(w)
-		}
-		return err
-	})
-}
-
-func Body(component templ.Component) templ.Component {
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
-		templBuffer, templIsBuffer := w.(*bytes.Buffer)
-		if !templIsBuffer {
-			templBuffer = templ.GetBuffer()
-			defer templ.ReleaseBuffer(templBuffer)
-		}
-		ctx = templ.InitializeContext(ctx)
-		var_5 := templ.GetChildren(ctx)
-		if var_5 == nil {
-			var_5 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<body class=\"bg-stone-100 px-6 w-full flex flex-col relative\">")
-		if err != nil {
-			return err
-		}
-		err = component.Render(ctx, templBuffer)
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("</body>")
+		_, err = templBuffer.WriteString("</button>")
 		if err != nil {
 			return err
 		}

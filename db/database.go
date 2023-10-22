@@ -1,17 +1,21 @@
 package db
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/muhwyndhamhp/spill/config"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-var database *gorm.DB
+var database *Queries
 
-func init() {
-	dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+func GetDB(ctx context.Context) *Queries {
+	if database != nil {
+		return database
+	}
+
+	dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		config.Get(config.DB_HOST),
 		config.Get(config.DB_PORT),
 		config.Get(config.DB_USER),
@@ -19,13 +23,11 @@ func init() {
 		config.Get(config.DB_PASSWORD),
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
 		panic(err)
 	}
-	database = db
-}
+	database = New(pool)
 
-func GetDB() *gorm.DB {
 	return database
 }

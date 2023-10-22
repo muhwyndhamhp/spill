@@ -1,0 +1,29 @@
+package public
+
+templ RedirectRegister() {
+    @DocType()
+    @Head()
+    @Body(pageRedirectRegister())
+}
+
+templ pageRedirectRegister() {
+    <h1>Welcome to Spill!</h1>
+
+    <div class="p-4 bg-white rounded-xl w-1/3 m-auto shadow-rose-100/50 shadow-2xl">
+    <h2>Please enter your information</h2>
+    <form>
+        @registerInput("Alias", "alias", "text", "please state your alias (Ex. GodMode99)")
+        @registerInput("Bio", "bio", "text", "Enter bio (Max. 300 Words)")
+        <button hx-post="/v1/register" class="bg-blue-600 hover:bg-blue-500 w-full text-white px-4 py-3 mt-10 rounded-xl">Submit</button>
+    </form>
+    </div>
+}
+
+
+templ registerInput(label, inputName, inputType, inputPlaceholder string) {
+    <div class="mt-4">
+        <p>{ label }</p>
+        <input class="mt-2 w-full px-4 py-3 border-transparent bg-stone-100 rounded-xl" type={ inputType } placeholder={ inputPlaceholder } name={ inputName }></input>
+        <br/>
+    </div>
+}

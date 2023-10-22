@@ -1,0 +1,12 @@
+package public
+
+templ RedirectLogin(marshaledSession string) {
+    @DocType()
+    @Head()
+    @Body(pageRedirectLogin(marshaledSession))
+}
+
+templ pageRedirectLogin(marshaledSession string) {
+    <p> This is the session information after Login</p>
+    <p>{marshaledSession}</p>
+}

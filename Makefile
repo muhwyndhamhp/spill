@@ -23,3 +23,13 @@ setup-local: tools
 
 run:
 	@air -c .air.toml --build.cmd "go build -ldflags \"$(LDFLAGS)\" -o ./tmp/main ."
+
+
+migrate-create: $(MIGRATE)
+	@read -p "Please provide name for the migration: " Name; \
+	migrate create -ext sql -dir db/migrations $${Name}
+
+
+migrate-up: $(MIGRATE)
+	@echo "Currently Running DB Migration"
+	@migrate -database $(DB_DSN) -path=db/migrations up
