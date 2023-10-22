@@ -137,3 +137,14 @@ func (q *Queries) GetSpillUsersFromCompanyID(ctx context.Context, companyID int6
 	}
 	return items, nil
 }
+
+const spillUserByAliasExist = `-- name: SpillUserByAliasExist :one
+SELECT EXISTS(SELECT id, alias, bio, created_at, updated_at, deleted_at, service_id FROM spill_users WHERE alias = $1)
+`
+
+func (q *Queries) SpillUserByAliasExist(ctx context.Context, alias string) (bool, error) {
+	row := q.db.QueryRow(ctx, spillUserByAliasExist, alias)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}

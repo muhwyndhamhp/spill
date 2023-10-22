@@ -13,4 +13,5 @@ INSERT INTO spill_users(alias, service_id, bio, created_at, updated_at) VALUES (
 -- name: GetSpillUsersFromCompanyID :many
 SELECT u.* FROM companies_spill_users AS csu JOIN spill_users AS u ON csu.spill_user_id = u.id WHERE csu.company_id = $1 ORDER BY u.id;
 
-
+-- name: SpillUserByAliasExist :one
+SELECT EXISTS(SELECT * FROM spill_users WHERE alias = $1);
