@@ -9,7 +9,7 @@ import "context"
 import "io"
 import "bytes"
 
-func RedirectRegister() templ.Component {
+func InputField(label, inputName, inputType, inputPlaceholder string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {
@@ -22,15 +22,40 @@ func RedirectRegister() templ.Component {
 			var_1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		err = DocType().Render(ctx, templBuffer)
+		_, err = templBuffer.WriteString("<div class=\"mt-4\"><p>")
 		if err != nil {
 			return err
 		}
-		err = Head().Render(ctx, templBuffer)
+		var var_2 string = label
+		_, err = templBuffer.WriteString(templ.EscapeString(var_2))
 		if err != nil {
 			return err
 		}
-		err = Body(pageRedirectRegister()).Render(ctx, templBuffer)
+		_, err = templBuffer.WriteString("</p><input class=\"mt-2 w-full px-4 py-3 border-transparent bg-stone-100 rounded-xl\" type=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(inputType))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\" placeholder=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(inputPlaceholder))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\" name=\"")
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString(templ.EscapeString(inputName))
+		if err != nil {
+			return err
+		}
+		_, err = templBuffer.WriteString("\"><br></div>")
 		if err != nil {
 			return err
 		}
@@ -41,7 +66,7 @@ func RedirectRegister() templ.Component {
 	})
 }
 
-func pageRedirectRegister() templ.Component {
+func FormButton(hxPost string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {
@@ -49,46 +74,29 @@ func pageRedirectRegister() templ.Component {
 			defer templ.ReleaseBuffer(templBuffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		var_2 := templ.GetChildren(ctx)
-		if var_2 == nil {
-			var_2 = templ.NopComponent
+		var_3 := templ.GetChildren(ctx)
+		if var_3 == nil {
+			var_3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, err = templBuffer.WriteString("<h1>")
+		_, err = templBuffer.WriteString("<button hx-post=\"")
 		if err != nil {
 			return err
 		}
-		var_3 := `Welcome to Spill!`
-		_, err = templBuffer.WriteString(var_3)
+		_, err = templBuffer.WriteString(templ.EscapeString(hxPost))
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</h1><div class=\"p-4 bg-white rounded-xl w-1/3 m-auto shadow-rose-100/50 shadow-2xl\"><h2>")
+		_, err = templBuffer.WriteString("\" class=\"bg-blue-600 hover:bg-blue-500 w-full text-white px-4 py-3 mt-10 rounded-xl\">")
 		if err != nil {
 			return err
 		}
-		var_4 := `Please enter your information`
+		var_4 := `Submit`
 		_, err = templBuffer.WriteString(var_4)
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</h2><form>")
-		if err != nil {
-			return err
-		}
-		err = InputField("Alias", "alias", "text", "please state your alias (Ex. GodMode99)").Render(ctx, templBuffer)
-		if err != nil {
-			return err
-		}
-		err = InputField("Bio", "bio", "text", "Enter bio (Max. 300 Words)").Render(ctx, templBuffer)
-		if err != nil {
-			return err
-		}
-		err = FormButton("/v1/register").Render(ctx, templBuffer)
-		if err != nil {
-			return err
-		}
-		_, err = templBuffer.WriteString("</form></div>")
+		_, err = templBuffer.WriteString("</button>")
 		if err != nil {
 			return err
 		}

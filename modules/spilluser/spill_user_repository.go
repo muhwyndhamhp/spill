@@ -2,12 +2,15 @@ package spilluser
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/muhwyndhamhp/spill/db"
 	"github.com/muhwyndhamhp/spill/utils/errs"
 )
+
+var ErrAliasUsed = errors.New("ErrAliasUsed: alias has been used")
 
 type SpillUserRepository struct {
 	db *db.Queries
@@ -21,6 +24,11 @@ func NewSpillUserRepository(db *db.Queries) *SpillUserRepository {
 
 func (r *SpillUserRepository) CreateSpillUser(ctx context.Context, value *db.SpillUser) (id int64, err error) {
 	now := time.Now()
+	exists, _ := r.db.SpillUserByAliasExist(ctx, value.Alias)
+	if exists {
+		return 0, ErrAliasUsed
+	}
+
 	id, err = r.db.CreateSpillUser(ctx, db.CreateSpillUserParams{
 		Alias:     value.Alias,
 		ServiceID: value.ServiceID,

@@ -11,11 +11,11 @@ import (
 	"github.com/muhwyndhamhp/spill/auth"
 	"github.com/muhwyndhamhp/spill/config"
 	"github.com/muhwyndhamhp/spill/db"
+	"github.com/muhwyndhamhp/spill/modules/company"
 	"github.com/muhwyndhamhp/spill/modules/spilluser"
 	v1 "github.com/muhwyndhamhp/spill/modules/spilluser/v1"
 	"github.com/muhwyndhamhp/spill/public"
 	"github.com/muhwyndhamhp/spill/template"
-	"github.com/muhwyndhamhp/spill/utils/errs"
 	"github.com/muhwyndhamhp/spill/utils/routing"
 )
 
@@ -38,21 +38,28 @@ func main() {
 
 	ctx := context.Background()
 	spillUserRepo := spilluser.NewSpillUserRepository(db.GetDB(ctx))
-	spillUserCtrl := spilluser.NewSpillUserController(spillUserRepo)
-	v1.NewSpillUserFrontend(g, &client, spillUserCtrl)
+	companyRepo := company.NewCompanyRepository(db.GetDB(ctx))
+	v1.NewSpillUserFrontend(g, &client, spillUserRepo, companyRepo)
 
 	e.GET("/", func(c echo.Context) error {
 		name := ""
 		session, ok := clerk.SessionFromContext(c.Request().Context())
-		if ok {
-			ss := &auth.Session{Claim: session}
-			u, err := ss.GetUser(client)
-			if err != nil {
-				return errs.Wrap(err)
-			}
-
-			name = fmt.Sprintf("%s %s", *u.FirstName, *u.LastName)
+		if !ok {
+			return c.Redirect(http.StatusFound, "/v1/login")
 		}
+		ss := &auth.Session{Claim: session}
+		u, err := ss.GetUser(client)
+		if err != nil {
+			return c.Redirect(http.StatusFound, "/v1/login")
+		}
+
+		cExist, _ := companyRepo.CompanyWithServiceIDExists(c.Request().Context(), u.ID)
+
+		if !cExist {
+			return c.Redirect(http.StatusFound, "/v1/users/companies/register")
+		}
+
+		name = fmt.Sprintf("%s %s", *u.FirstName, *u.LastName)
 		component := public.Index(name)
 		return template.AssertRender(c, http.StatusOK, component)
 	})

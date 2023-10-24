@@ -9,17 +9,23 @@ import (
 	"context"
 )
 
-const createCompany = `-- name: CreateCompany :one
-INSERT INTO companies(id, name, overall_score) VALUES($1, $2, 0.0) RETURNING id
+const companyByServiceIDExist = `-- name: CompanyByServiceIDExist :one
+SELECT EXISTS (SELECT c.id FROM companies_spill_users AS csu JOIN spill_users AS u ON csu.spill_user_id = u.id JOIN companies as c ON csu.company_id = c.id WHERE u.service_id = $1 ORDER BY c.id)
 `
 
-type CreateCompanyParams struct {
-	ID   int64
-	Name string
+func (q *Queries) CompanyByServiceIDExist(ctx context.Context, serviceID string) (bool, error) {
+	row := q.db.QueryRow(ctx, companyByServiceIDExist, serviceID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }
 
-func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createCompany, arg.ID, arg.Name)
+const createCompany = `-- name: CreateCompany :one
+INSERT INTO companies(name, overall_score) VALUES($1, 0.0) RETURNING id
+`
+
+func (q *Queries) CreateCompany(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRow(ctx, createCompany, name)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -31,6 +37,30 @@ SELECT id, name, overall_score FROM companies ORDER BY id
 
 func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
 	rows, err := q.db.Query(ctx, getCompanies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Company
+	for rows.Next() {
+		var i Company
+		if err := rows.Scan(&i.ID, &i.Name, &i.OverallScore); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCompaniesByServiceID = `-- name: GetCompaniesByServiceID :many
+SELECT c.id, c.name, c.overall_score FROM companies_spill_users AS csu JOIN spill_users AS u ON csu.spill_user_id = u.id JOIN companies as c ON csu.company_id = c.id WHERE u.service_id = $1 ORDER BY c.id
+`
+
+func (q *Queries) GetCompaniesByServiceID(ctx context.Context, serviceID string) ([]Company, error) {
+	rows, err := q.db.Query(ctx, getCompaniesByServiceID, serviceID)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +109,17 @@ SELECT id, name, overall_score FROM companies WHERE id = $1 LIMIT 1
 
 func (q *Queries) GetCompanyByID(ctx context.Context, id int64) (Company, error) {
 	row := q.db.QueryRow(ctx, getCompanyByID, id)
+	var i Company
+	err := row.Scan(&i.ID, &i.Name, &i.OverallScore)
+	return i, err
+}
+
+const getCompanyByName = `-- name: GetCompanyByName :one
+SELECT id, name, overall_score FROM companies WHERE LOWER(name) = $1
+`
+
+func (q *Queries) GetCompanyByName(ctx context.Context, name string) (Company, error) {
+	row := q.db.QueryRow(ctx, getCompanyByName, name)
 	var i Company
 	err := row.Scan(&i.ID, &i.Name, &i.OverallScore)
 	return i, err

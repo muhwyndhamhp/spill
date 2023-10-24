@@ -9,7 +9,7 @@ import "context"
 import "io"
 import "bytes"
 
-func RedirectRegister() templ.Component {
+func UsersCompaniesRegister() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {
@@ -30,7 +30,7 @@ func RedirectRegister() templ.Component {
 		if err != nil {
 			return err
 		}
-		err = Body(pageRedirectRegister()).Render(ctx, templBuffer)
+		err = Body(pageUsersCompaniesRegister()).Render(ctx, templBuffer)
 		if err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func RedirectRegister() templ.Component {
 	})
 }
 
-func pageRedirectRegister() templ.Component {
+func pageUsersCompaniesRegister() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		templBuffer, templIsBuffer := w.(*bytes.Buffer)
 		if !templIsBuffer {
@@ -58,7 +58,7 @@ func pageRedirectRegister() templ.Component {
 		if err != nil {
 			return err
 		}
-		var_3 := `Welcome to Spill!`
+		var_3 := `Please add your current employement`
 		_, err = templBuffer.WriteString(var_3)
 		if err != nil {
 			return err
@@ -67,7 +67,7 @@ func pageRedirectRegister() templ.Component {
 		if err != nil {
 			return err
 		}
-		var_4 := `Please enter your information`
+		var_4 := `Please enter your company name`
 		_, err = templBuffer.WriteString(var_4)
 		if err != nil {
 			return err
@@ -76,15 +76,11 @@ func pageRedirectRegister() templ.Component {
 		if err != nil {
 			return err
 		}
-		err = InputField("Alias", "alias", "text", "please state your alias (Ex. GodMode99)").Render(ctx, templBuffer)
+		err = InputField("Company Name", "company_name", "text", "Company Name (Ex. Google, Uber, Netflix)").Render(ctx, templBuffer)
 		if err != nil {
 			return err
 		}
-		err = InputField("Bio", "bio", "text", "Enter bio (Max. 300 Words)").Render(ctx, templBuffer)
-		if err != nil {
-			return err
-		}
-		err = FormButton("/v1/register").Render(ctx, templBuffer)
+		err = FormButton("/v1/users/companies/upsert").Render(ctx, templBuffer)
 		if err != nil {
 			return err
 		}

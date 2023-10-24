@@ -15,3 +15,4 @@ SELECT u.* FROM companies_spill_users AS csu JOIN spill_users AS u ON csu.spill_
 
 -- name: SpillUserByAliasExist :one
 SELECT EXISTS(SELECT * FROM spill_users WHERE alias = $1);
+
